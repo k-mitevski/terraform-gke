@@ -57,11 +57,11 @@ module "gke" {
     {
       name                      = "node-pool"
       machine_type              = "e2-medium"
-      node_locations            = "europe-west1-b,europe-west1-c"
+      node_locations            = "europe-west1-b"
       min_count                 = 1
       max_count                 = 1
       disk_size_gb              = 30
-    },
+    }
   ]
 }
 
