@@ -1,9 +1,15 @@
-provider "google" {
-  version = "~> 3.42.0"
+terraform {
+  required_providers {
+    google = {
+      source = "hashicorp/google"
+      version = "4.47.0"
+    }
+  }
 }
 
 module "gke_auth" {
   source = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+  version = "24.1.0"
   depends_on   = [module.gke]
   project_id   = var.project_id
   location     = module.gke.location
@@ -17,7 +23,7 @@ resource "local_file" "kubeconfig" {
 
 module "gcp-network" {
   source       = "terraform-google-modules/network/google"
-  version      = "~> 2.5"
+  version      = "6.0.0"
   project_id   = var.project_id
   network_name = "${var.network}-${var.env_name}"
 
@@ -43,8 +49,17 @@ module "gcp-network" {
   }
 }
 
+data "google_client_config" "default" {}
+
+provider "kubernetes" {
+  host                   = "https://${module.gke.endpoint}"
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(module.gke.ca_certificate)
+}
+
 module "gke" {
   source                 = "terraform-google-modules/kubernetes-engine/google//modules/private-cluster"
+  version                = "24.1.0"
   project_id             = var.project_id
   name                   = "${var.cluster_name}-${var.env_name}"
   regional               = true
@@ -53,6 +68,7 @@ module "gke" {
   subnetwork             = module.gcp-network.subnets_names[0]
   ip_range_pods          = var.ip_range_pods_name
   ip_range_services      = var.ip_range_services_name
+  
   node_pools = [
     {
       name                      = "node-pool"
