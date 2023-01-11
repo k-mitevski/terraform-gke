@@ -13,6 +13,15 @@ spec:
     spec:
       containers:
       - name: app
-        image: paulbouwer/hello-kubernetes:1.8
+        image: paulbouwer/hello-kubernetes:1.10.1
         ports:
           - containerPort: 8080
+        env:
+        - name: KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: KUBERNETES_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName

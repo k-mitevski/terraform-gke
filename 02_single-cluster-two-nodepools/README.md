@@ -1,6 +1,6 @@
 # Single cluster with two node pools
 
-This code will add one additional node pool with n1-highcpu-4 instance.
+This code will add one additional node pool with `n1-highcpu-4` instance.
 
 You can provision the cluster with the following commands:
 
